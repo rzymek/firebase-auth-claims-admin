@@ -11,7 +11,7 @@ interface AuthActionsParams {
 export function createDataProvider(firebaseApp: FirebaseApp): DataProvider {
 
     const firebaseFunctions = getFunctions(firebaseApp);
-    connectFunctionsEmulator(firebaseFunctions, 'localhost', 5001);
+    window.location.hostname === 'localhost' && connectFunctionsEmulator(firebaseFunctions, 'localhost', 5001);
     const authActions = httpsCallable<AuthActionsParams, any>(firebaseFunctions, 'authActions');
 
     return {

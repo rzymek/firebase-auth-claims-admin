@@ -3,8 +3,9 @@ import { initializeApp } from "firebase/app";
 import { useEffect, useState } from "react";
 import {
   Admin, AdminProps, ArrayField, BooleanField, BulkDeleteWithConfirmButton, BulkUpdateButton, ChipField,
-   Datagrid, EmailField, List, MutationMode, Resource, SingleFieldList, TextField
+  Datagrid, EmailField, Layout, LayoutProps, List, MutationMode, Resource, SingleFieldList, TextField
 } from 'react-admin';
+import "./App.css";
 import { AuthConfig } from "./AuthConfig";
 import { createAuthProvider } from "./authProvider";
 import { createDataProvider } from "./dataProvider";
@@ -58,6 +59,9 @@ function Loading() {
   }} />
 }
 
+const Nothing = () => <></>;
+const NoMenuLayout = (props:LayoutProps) => <Layout {...props} menu={Nothing} sidebar={Nothing} />
+
 function App() {
   const [adminProps, setAdminProps] = useState<AdminProps>();
   useEffect(() => {
@@ -75,7 +79,7 @@ function App() {
     }).catch(() => setAdminProps({}));
   }, []);
   return !adminProps ? <Loading /> :
-    <Admin requireAuth {...adminProps} >
+    <Admin requireAuth {...adminProps} layout={NoMenuLayout}>
       <Resource name="users" list={UserList} />
     </Admin>
 }

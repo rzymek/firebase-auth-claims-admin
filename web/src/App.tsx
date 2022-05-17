@@ -3,13 +3,14 @@ import { initializeApp } from "firebase/app";
 import { useEffect, useState } from "react";
 import {
   Admin, AdminProps, ArrayField, BooleanField, BulkDeleteWithConfirmButton, BulkUpdateButton, ChipField,
-  Datagrid, EmailField, Layout, LayoutProps, List, MutationMode, Resource, SingleFieldList, TextField
+  Datagrid, EmailField, Layout, LayoutProps, List, MutationMode, RaThemeOptions, Resource, SimpleList, SingleFieldList, TextField
 } from 'react-admin';
 import "./App.css";
 import { AuthConfig } from "./AuthConfig";
 import { createAuthProvider } from "./authProvider";
 import { createDataProvider } from "./dataProvider";
 import { createLoginPage } from "./LoginPage";
+import { useMediaQuery } from '@mui/material';
 
 export const GroupList = () => (
   <List>
@@ -31,21 +32,33 @@ const ListActions = () => {
     </>
   );
 };
+const GroupsField = () => (
+  <ArrayField source="groups">
+    <SingleFieldList>
+      <ChipField source="name" />
+    </SingleFieldList>
+  </ArrayField>
+)
 
-export const UserList = () => (
-  <List>
-    <Datagrid rowClick="toggleSelection" bulkActionButtons={<ListActions />}>
-      <TextField source="displayName" />
-      <EmailField source="email" />
-      <BooleanField source="enabled" />
-      <ArrayField source="groups">
-        <SingleFieldList>
-          <ChipField source="name" />
-        </SingleFieldList>
-      </ArrayField>
-    </Datagrid>
-  </List>
-);
+export const UserList = () => {
+  const isSmall = useMediaQuery((theme: RaThemeOptions) => theme.breakpoints?.down?.('sm')!!);
+  return (
+    <List>
+      {isSmall
+        ? <SimpleList
+          primaryText={record => <>{record.displayName} <BooleanField source="enabled" /></>}
+          secondaryText={record => <EmailField source="email" />}
+          tertiaryText={record => <GroupsField />}
+        />
+        : <Datagrid rowClick="toggleSelection" bulkActionButtons={<ListActions />}>
+          <TextField source="displayName" />
+          <EmailField source="email" />
+          <BooleanField source="enabled" />
+          <GroupsField />
+        </Datagrid>}
+    </List>
+  );
+};
 
 function Loading() {
   const size = 100;
@@ -60,7 +73,7 @@ function Loading() {
 }
 
 const Nothing = () => <></>;
-const NoMenuLayout = (props:LayoutProps) => <Layout {...props} menu={Nothing} sidebar={Nothing} />
+const NoMenuLayout = (props: LayoutProps) => <Layout {...props} menu={Nothing} sidebar={Nothing} />
 
 function App() {
   const [adminProps, setAdminProps] = useState<AdminProps>();
@@ -85,3 +98,4 @@ function App() {
 }
 
 export default App;
+

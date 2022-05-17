@@ -6,6 +6,6 @@ tmux \
 	bind q kill-session	\;\
 	new-session -c web "npm run start" \;\
 	split-window -c functions "npm run build -- --watch" \;\
-	split-window -fh -c functions "firebase emulators:start --only functions" \;\
+	split-window -fh -c functions "firebase emulators:start --only functions --project auth-claims-admin-demo" \;\
 	select-pane -U
 

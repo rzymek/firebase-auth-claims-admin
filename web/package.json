@@ -33,7 +33,7 @@
       "react-app/jest"
     ]
   },
-  "proxy": "http://localhost:5001/selfdev/us-central1/",
+  "proxy": "http://localhost:5001/auth-claims-admin-demo/us-central1/",
   "browserslist": {
     "production": [
       ">0.2%",

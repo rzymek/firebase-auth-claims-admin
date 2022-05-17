@@ -12,15 +12,13 @@ async function enabledSocialLogins(context: SecurityContext) {
 
 export async function getProjectConfig() {
     const context = await securityContext();
-    const { client: { apiKey }, signIn: { email, anonymous } } = await fetchProjectConfig(context);
-    const socialLogins = await enabledSocialLogins(context);
+    const { client: { apiKey }, signIn: { email } } = await fetchProjectConfig(context);
+    const signInProviders = await enabledSocialLogins(context);
+    if (email?.enabled) {
+        signInProviders.push('password')
+    }
     return {
         apiKey,
-        signIn: {
-            anonymous: !!anonymous,
-            emailLink: email?.enabled && email?.passwordRequired !== true,
-            emailPassword: !!email?.enabled,
-            socialLogins,
-        },
+        signInProviders
     }
 }

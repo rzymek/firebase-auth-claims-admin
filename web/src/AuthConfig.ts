@@ -1,10 +1,7 @@
+import { FirebaseSignInProvider } from "@firebase/util"
+
 export interface AuthConfig {
-    apiKey: string
-    projectId: string
-    signIn: {
-      anonymous: boolean
-      emailLink: boolean
-      emailPassword: boolean
-      socialLogins: string[]
-    }
-  }
+  apiKey: string
+  projectId: string
+  signInProviders: FirebaseSignInProvider[]
+}

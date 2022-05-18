@@ -1,3 +1,5 @@
+[![Demo Deployment](https://github.com/rzymek/firebase-auth-claims-admin/actions/workflows/node.js.yml/badge.svg)](https://github.com/rzymek/firebase-auth-claims-admin/actions/workflows/node.js.yml)
+
 # Deployment
 
 One line deployment. There's no need to copy over any configs or project keys. Jutro run:

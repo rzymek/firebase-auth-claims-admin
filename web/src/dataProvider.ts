@@ -17,7 +17,9 @@ export function createDataProvider(firebaseApp: FirebaseApp): DataProvider {
     return {
         async getList(resource, params) {
             const { data } = await authActions({ action: "listUsers" })
-            return { data, total: data.length }
+            const { q = '' } = params.filter;
+            const results = data.filter((it: any) => it.email.includes(q) || it.displayName.includes(q));
+            return { data: results, total: results.length }
         },
         getOne: (resource, params) => Promise.reject(), // get a single record by id
         getMany: (resource, params) => Promise.reject(), // get a list of records based on an array of ids

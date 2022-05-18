@@ -1,16 +1,15 @@
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, useMediaQuery } from "@mui/material";
 import { initializeApp } from "firebase/app";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Admin, AdminProps, ArrayField, BooleanField, BulkDeleteWithConfirmButton, BulkUpdateButton, ChipField,
-  Datagrid, EmailField, Layout, LayoutProps, List, MutationMode, RaThemeOptions, Resource, SimpleList, SingleFieldList, TextField
+  Datagrid, EmailField, ExportButton, Layout, LayoutProps, List, MutationMode, RaThemeOptions, Resource, SearchInput, SimpleList, SingleFieldList, TextField, TopToolbar
 } from 'react-admin';
 import "./App.css";
 import { AuthConfig } from "./AuthConfig";
 import { createAuthProvider } from "./authProvider";
 import { createDataProvider } from "./dataProvider";
 import { createLoginPage } from "./LoginPage";
-import { useMediaQuery } from '@mui/material';
 
 export const GroupList = () => (
   <List>
@@ -39,11 +38,14 @@ const GroupsField = () => (
     </SingleFieldList>
   </ArrayField>
 )
+const filters = [
+  <SearchInput source="q" alwaysOn />,
+]
 
 export const UserList = () => {
   const isSmall = useMediaQuery((theme: RaThemeOptions) => theme.breakpoints?.down?.('sm')!!);
   return (
-    <List>
+    <List filters={filters} actions={<TopToolbar><ExportButton /></TopToolbar>}>
       {isSmall
         ? <SimpleList
           primaryText={record => <>{record.displayName} <BooleanField source="enabled" /></>}
@@ -92,7 +94,7 @@ function App() {
     }).catch(() => setAdminProps({}));
   }, []);
   return !adminProps ? <Loading /> :
-    <Admin requireAuth {...adminProps} layout={NoMenuLayout}>
+    <Admin requireAuth {...adminProps} layout={NoMenuLayout} >
       <Resource name="users" list={UserList} />
     </Admin>
 }

@@ -16,6 +16,7 @@ jobs:
 #         cache: 'npm'
     - uses: w9jds/firebase-action@master
       with:
-        args: deploy --project auth-claims-admin-demo --message \"${{ github.event.head_commit.message }}\"
+        args: deploy --message \"${{ github.event.head_commit.message }}\"
       env:
         FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        PROJECT_ID: auth-claims-admin-demo

@@ -12,7 +12,7 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: '16'
-        cache: 'yarm'
+        cache: 'yarn'
         cache-dependency-path: '**/yarn.lock'
     - uses: w9jds/firebase-action@master
       with:

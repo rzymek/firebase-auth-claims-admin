@@ -1,7 +1,6 @@
 import SubmitIcon from '@mui/icons-material/Check';
 import SecurityIcon from '@mui/icons-material/Security';
 import Checkbox, { CheckboxProps } from '@mui/material/Checkbox';
-import CircularProgress from '@mui/material/CircularProgress';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
@@ -10,7 +9,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Popover from "@mui/material/Popover";
 import TextField from '@mui/material/TextField';
 import { useRefresh } from 'ra-core';
-import { FormEventHandler, useMemo, useState } from "react";
+import { FormEventHandler, useState } from "react";
 import { Button, useGetList, useListContext, useLoading, useUpdateMany } from "react-admin";
 
 function GroupsEdit() {

@@ -1,15 +1,18 @@
-import { CircularProgress, useMediaQuery } from "@mui/material";
+import LockIcon from '@mui/icons-material/Lock';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
+import { CircularProgress, Typography, useMediaQuery } from "@mui/material";
 import { initializeApp } from "firebase/app";
 import React, { useEffect, useState } from "react";
 import {
-  Admin, AdminProps, ArrayField, BooleanField, BulkDeleteWithConfirmButton, BulkUpdateButton, ChipField,
-  Datagrid, EmailField, ExportButton, Layout, LayoutProps, List, MutationMode, RaThemeOptions, Resource, SearchInput, SimpleList, SingleFieldList, TextField, TopToolbar
+  Admin, AdminProps, AppBar, ArrayField, BooleanField, BulkDeleteWithConfirmButton, BulkUpdateButton, ChipField,
+  Datagrid, defaultTheme, EmailField, ExportButton, Layout, LayoutProps, List, MutationMode, RaThemeOptions, Resource, SearchInput, SimpleList, SingleFieldList, TextField, ToggleThemeButton, TopToolbar
 } from 'react-admin';
 import "./App.css";
 import { AuthConfig } from "./AuthConfig";
 import { createAuthProvider } from "./authProvider";
 import { createDataProvider } from "./dataProvider";
 import { createLoginPage } from "./LoginPage";
+import { UpdateGroupsButton } from './UpdateGroupsButton';
 
 export const GroupList = () => (
   <List>
@@ -24,10 +27,9 @@ const ListActions = () => {
   return (
     <>
       <BulkDeleteWithConfirmButton mutationMode={mutationMode} />
-      <BulkUpdateButton label="Disable" data={{ action: 'disable' }} mutationMode={mutationMode} />
-      <BulkUpdateButton label="Enable" data={{ action: 'enable' }} mutationMode={mutationMode} />
-      <BulkUpdateButton label="Admin" data={{ action: 'give-admin' }} mutationMode={mutationMode} />
-      <BulkUpdateButton label="User" data={{ action: 'take-admin' }} mutationMode={mutationMode} />
+      <BulkUpdateButton label="Disable" data={{ action: 'disable' }} mutationMode={mutationMode} icon={<LockIcon />}  />
+      <BulkUpdateButton label="Enable" data={{ action: 'enable' }} mutationMode={mutationMode} icon={<LockOpenIcon />} />
+      <UpdateGroupsButton />
     </>
   );
 };
@@ -74,8 +76,23 @@ function Loading() {
   }} />
 }
 
+const darkTheme: RaThemeOptions = {
+  palette: { mode: 'dark' },
+};
+export const MyAppBar = (props: any) => (
+  <AppBar {...props}>
+    <Typography flex="1" variant="h6" id="react-admin-title"></Typography>
+
+    <ToggleThemeButton
+      lightTheme={defaultTheme}
+      darkTheme={darkTheme}
+    />
+  </AppBar>
+);
+
 const Nothing = () => <></>;
-const NoMenuLayout = (props: LayoutProps) => <Layout {...props} menu={Nothing} sidebar={Nothing} />
+const NoMenuLayout = (props: LayoutProps) =>
+  <Layout {...props} menu={Nothing} sidebar={Nothing} appBar={MyAppBar} />
 
 function App() {
   const [adminProps, setAdminProps] = useState<AdminProps>();
@@ -94,8 +111,8 @@ function App() {
     }).catch(() => setAdminProps({}));
   }, []);
   return !adminProps ? <Loading /> :
-    <Admin requireAuth {...adminProps} layout={NoMenuLayout} >
-      <Resource name="users" list={UserList} />
+    <Admin requireAuth {...adminProps} layout={NoMenuLayout}>
+      <Resource name="Users" list={UserList} />
     </Admin>
 }
 

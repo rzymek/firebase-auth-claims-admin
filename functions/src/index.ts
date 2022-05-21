@@ -1,6 +1,6 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
-import { assignGroups, listUsers, toggleDisabled } from "./actions";
+import { assignGroups, listGroups, listUsers, toggleDisabled } from "./actions";
 import { checkAdmin, tokenBelongsToProjectOwner } from "./checkAdmin";
 import { getProjectConfig } from "./projectConfig";
 
@@ -9,18 +9,21 @@ admin.initializeApp();
 exports.authActions = functions.https.onCall(async (params: {
     action: string,
     uids: string[],
-    groups: string[],
+    groups: { [group: string]: boolean },
 }, context) => {
     await checkAdmin(context.auth?.token);
     const actions: { [action: string]: () => Promise<unknown> } = {
         async disable() {
-            await toggleDisabled(params.uids, true, context.auth?.uid);
+            return await toggleDisabled(params.uids, true, context.auth?.uid);
         },
         async enable() {
-            await toggleDisabled(params.uids, false);
+            return await toggleDisabled(params.uids, false);
         },
         async listUsers() {
             return listUsers();
+        },
+        async listGroups() {
+            return listGroups();
         },
         async assignGroups() {
             return await assignGroups(params.uids, params.groups, context.auth?.uid)

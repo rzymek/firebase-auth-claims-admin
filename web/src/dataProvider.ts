@@ -6,6 +6,7 @@ interface AuthActionsParams {
     action: 'disable' | 'delete' | 'enable' | 'listUsers' | 'assignGroups',
     uids?: string[],
     groups?: string[],
+    filter?: {},
 }
 
 export function createDataProvider(firebaseApp: FirebaseApp): DataProvider {
@@ -16,27 +17,27 @@ export function createDataProvider(firebaseApp: FirebaseApp): DataProvider {
 
     return {
         async getList(resource, params) {
-            const { data } = await authActions({ action: "listUsers" })
-            const { q = '' } = params.filter;
-            const results = data.filter((it: any) => it.email.includes(q) || it.displayName.includes(q));
-            return { data: results, total: results.length }
+            const { data } = await authActions({ action: `list${resource}` as any, filter: params.filter })
+            return { data, total: data.length }
         },
-        getOne: (resource, params) => Promise.reject(), // get a single record by id
-        getMany: (resource, params) => Promise.reject(), // get a list of records based on an array of ids
+        getOne: (resource, params) => {
+            return Promise.reject();
+        }, // get a single record by id
+        getMany: (resource, params) => {
+            return Promise.reject();
+        }, // get a list of records based on an array of ids
         getManyReference: (resource, params) => Promise.reject(), // get the records referenced to another record, e.g. comments for a post
         create: (resource, params) => Promise.reject(), // create a record
         update: (resource, params) => Promise.reject(), // update a record based on a patch
         async updateMany(resource, params) {
             const uids = params.ids as string[]
             const { action } = params.data;
-            if (action === 'give-admin') {
-                await authActions({ action: 'assignGroups', uids, groups: ['admin'] });
-            } else if (action === 'take-admin') {
-                await authActions({ action: 'assignGroups', uids, groups: [] });
-            } else {
+            if (action === 'enable' || action === 'disable') {
                 await authActions({ action, uids });
+            } else {
+                await authActions({ action: 'assignGroups', uids, groups: params.data });
             }
-            return { data: params.ids };
+            return { data: uids };
         }, // update a list of records based on an array of ids and a common patch
         delete: (resource, params) => Promise.reject(), // delete a record by id
         async deleteMany(resource, params) {

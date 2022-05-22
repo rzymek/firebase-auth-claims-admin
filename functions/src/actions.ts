@@ -35,7 +35,7 @@ export async function assignGroups(uids: string[], groups: { [group: string]: bo
     const modified = await Promise.all(uids.map(uid => {
         const existingGroups: Set<string> = new Set(users[uid]?.customClaims?.groups ?? []);
         const newGroups = difference(union(existingGroups, add), remove);
-        if (uid === callerUid && existingGroups.has(ADMIN_GROUP_NAME)) {
+        if (uid === callerUid) {
             newGroups.add(ADMIN_GROUP_NAME);
         }
         if (equal(existingGroups, newGroups)) {
@@ -48,15 +48,28 @@ export async function assignGroups(uids: string[], groups: { [group: string]: bo
     return modified.filter(it => it);
 };
 
-export async function listUsers() {
+export async function listUsers(filter: { q?: string, group?: string }) {
     const list = await admin.auth().listUsers();
-    return list.users.map(user => ({
+    let users = list.users.map(user => ({
         id: user.uid,
         email: user.email,
         displayName: user.displayName,
-        groups: (user.customClaims?.groups ?? []).map((group: string) => ({
-            name: group
+        groups: ((user.customClaims?.groups ?? []) as string[]).sort().map((group: string) => ({
+            id: group
         })),
         enabled: !user.disabled
     }))
+    if (filter.group) {
+        users = users.filter(user => user.groups.map(group => group.id).includes(filter.group!!))
+    }
+    if (filter.q) {
+        users = users.filter(user => fullTextSearch(user, filter.q!!.toLowerCase()))
+    }
+    return users;
 }
+
+function fullTextSearch(user: { id: string; email: string | undefined; displayName: string | undefined; groups: any; enabled: boolean; }, q: string) {
+    return user.email?.toLowerCase()?.includes(q) ||
+        user.displayName?.toLocaleLowerCase()?.includes(q);
+}
+

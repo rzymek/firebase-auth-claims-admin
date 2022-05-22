@@ -1,11 +1,12 @@
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
-import { CircularProgress, Typography, useMediaQuery } from "@mui/material";
+import GroupFilterIcon from '@mui/icons-material/Security';
+import { Card, CardContent, CircularProgress, Typography, useMediaQuery } from "@mui/material";
 import { initializeApp } from "firebase/app";
 import React, { useEffect, useState } from "react";
 import {
   Admin, AdminProps, AppBar, ArrayField, BooleanField, BulkDeleteWithConfirmButton, BulkUpdateButton, ChipField,
-  Datagrid, defaultTheme, EmailField, ExportButton, Layout, LayoutProps, List, MutationMode, RaThemeOptions, Resource, SearchInput, SimpleList, SingleFieldList, TextField, ToggleThemeButton, TopToolbar
+  Datagrid, defaultTheme, EmailField, ExportButton, FilterList, FilterListItem, Layout, LayoutProps, List, MutationMode, RaThemeOptions, Resource, SearchInput, SimpleList, SingleFieldList, TextField, ToggleThemeButton, TopToolbar, useGetList
 } from 'react-admin';
 import "./App.css";
 import { AuthConfig } from "./AuthConfig";
@@ -27,27 +28,58 @@ const ListActions = () => {
   return (
     <>
       <BulkDeleteWithConfirmButton mutationMode={mutationMode} />
-      <BulkUpdateButton label="Disable" data={{ action: 'disable' }} mutationMode={mutationMode} icon={<LockIcon />}  />
+      <BulkUpdateButton label="Disable" data={{ action: 'disable' }} mutationMode={mutationMode} icon={<LockIcon />} />
       <BulkUpdateButton label="Enable" data={{ action: 'enable' }} mutationMode={mutationMode} icon={<LockOpenIcon />} />
       <UpdateGroupsButton />
     </>
   );
 };
-const GroupsField = () => (
-  <ArrayField source="groups">
-    <SingleFieldList>
-      <ChipField source="name" />
-    </SingleFieldList>
-  </ArrayField>
-)
+function GroupsField() {
+  return (
+    <ArrayField source="groups">
+      <SingleFieldList>
+        <ChipField source="id" />
+      </SingleFieldList>
+    </ArrayField>
+  );
+}
 const filters = [
-  <SearchInput source="q" alwaysOn />,
+  <SearchInput source="q" alwaysOn style={{ width: '50vw' }} />,
 ]
+
+function FilterSidebar() {
+  const { data } = useGetList("Groups");
+  return <Card
+    sx={{
+      display: {
+        xs: 'none',
+        md: 'block',
+      },
+      order: -1,
+      flex: '0 0 15em',
+      mr: 2,
+      mt: 8,
+      alignSelf: 'flex-start',
+    }}
+  >
+    <CardContent>
+      <FilterList label="Groups" icon={<GroupFilterIcon />}>
+        {data?.map(group =>
+          <FilterListItem
+            key={group.id}
+            label={group.id}
+            value={{ group: group.id }}
+          />
+        )}
+      </FilterList>
+    </CardContent>
+  </Card>
+}
 
 export const UserList = () => {
   const isSmall = useMediaQuery((theme: RaThemeOptions) => theme.breakpoints?.down?.('sm')!!);
   return (
-    <List filters={filters} actions={<TopToolbar><ExportButton /></TopToolbar>}>
+    <List filters={filters} actions={<TopToolbar><ExportButton /></TopToolbar>} aside={<FilterSidebar />}>
       {isSmall
         ? <SimpleList
           primaryText={record => <>{record.displayName} <BooleanField source="enabled" /></>}

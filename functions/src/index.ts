@@ -10,6 +10,10 @@ exports.authActions = functions.https.onCall(async (params: {
     action: string,
     uids: string[],
     groups: { [group: string]: boolean },
+    filter?: {
+        group?: string,
+        q?: string,
+    }
 }, context) => {
     await checkAdmin(context.auth?.token);
     const actions: { [action: string]: () => Promise<unknown> } = {
@@ -20,7 +24,7 @@ exports.authActions = functions.https.onCall(async (params: {
             return await toggleDisabled(params.uids, false);
         },
         async listUsers() {
-            return listUsers();
+            return listUsers({ q: params.filter?.q, group: params.filter?.group });
         },
         async listGroups() {
             return listGroups();

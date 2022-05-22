@@ -3,10 +3,12 @@ import LockOpenIcon from '@mui/icons-material/LockOpen';
 import GroupFilterIcon from '@mui/icons-material/Security';
 import { Card, CardContent, CircularProgress, Typography, useMediaQuery } from "@mui/material";
 import { initializeApp } from "firebase/app";
+import { useEditContext } from 'ra-core';
+import { useRecordContext } from 'ra-core';
 import React, { useEffect, useState } from "react";
 import {
-  Admin, AdminProps, AppBar, ArrayField, BooleanField, BulkDeleteWithConfirmButton, BulkUpdateButton, ChipField,
-  Datagrid, defaultTheme, EmailField, ExportButton, FilterList, FilterListItem, Layout, LayoutProps, List, MutationMode, RaThemeOptions, Resource, SearchInput, SimpleList, SingleFieldList, TextField, ToggleThemeButton, TopToolbar, useGetList
+  Admin, AdminProps, AppBar, ArrayField, BooleanField, BooleanInput, BulkDeleteWithConfirmButton, BulkUpdateButton, ChipField,
+  Datagrid, defaultTheme, Edit, EmailField, ExportButton, FilterList, FilterListItem, Layout, LayoutProps, List, MutationMode, RaThemeOptions, ReferenceArrayInput, Resource, SearchInput, SelectArrayInput, SelectInput, SimpleForm, SimpleList, SingleFieldList, TextField, TextInput, ToggleThemeButton, TopToolbar, useGetList
 } from 'react-admin';
 import "./App.css";
 import { AuthConfig } from "./AuthConfig";
@@ -144,9 +146,35 @@ function App() {
   }, []);
   return !adminProps ? <Loading /> :
     <Admin requireAuth {...adminProps} layout={NoMenuLayout}>
-      <Resource name="Users" list={UserList} />
+      <Resource name="Users" list={UserList} edit={UserEdit} />
     </Admin>
 }
 
 export default App;
 
+const PostTitle = () => {
+  const record = useRecordContext();
+  console.log({ record });
+
+  return <span>User</span>;
+};
+
+function UserEdit(props: any) {
+  const { data: groupData } = useGetList('Groups')
+  console.log(props);
+
+  return <Edit title={<PostTitle />}>
+    <SimpleForm>
+      <TextInput disabled source="displayName" />
+      <TextInput disabled source="email" />
+      <TextInput disabled source="groups" />
+      <BooleanInput label="Enabled" source="enabled" />
+      <SelectArrayInput
+        source='groups'
+        choices={groupData?.map(g => ({ id: g.id, name: g.id }))}
+      >
+        <ChipField source="id" />
+      </SelectArrayInput>
+    </SimpleForm>
+  </Edit>
+}

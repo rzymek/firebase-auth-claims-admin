@@ -3,10 +3,14 @@ import { getFunctions, httpsCallable, connectFunctionsEmulator } from "firebase/
 import { DataProvider } from "react-admin";
 
 interface AuthActionsParams {
-    action: 'disable' | 'delete' | 'enable' | 'listUsers' | 'assignGroups',
+    action: 'disable' | 'delete' | 'enable' | 'listUsers' | 'assignGroups' | 'getUser',
     uids?: string[],
     groups?: string[],
-    filter?: {},
+    filter?: {
+        q?: string,
+        group?: string,
+    },
+    uid?: string,
 }
 
 export function createDataProvider(firebaseApp: FirebaseApp): DataProvider {
@@ -20,8 +24,9 @@ export function createDataProvider(firebaseApp: FirebaseApp): DataProvider {
             const { data } = await authActions({ action: `list${resource}` as any, filter: params.filter })
             return { data, total: data.length }
         },
-        getOne: (resource, params) => {
-            return Promise.reject();
+        async getOne(resource, params) {
+            const { data } = await authActions({ action: `getUser`, uid: params.id })
+            return { data };
         }, // get a single record by id
         getMany: (resource, params) => {
             return Promise.reject();

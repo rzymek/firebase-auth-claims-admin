@@ -48,17 +48,21 @@ export async function assignGroups(uids: string[], groups: { [group: string]: bo
     return modified.filter(it => it);
 };
 
-export async function listUsers(filter: { q?: string, group?: string }) {
-    const list = await admin.auth().listUsers();
-    let users = list.users.map(user => ({
+function mapUser(user: UserRecord) {
+    return ({
         id: user.uid,
         email: user.email,
         displayName: user.displayName,
         groups: ((user.customClaims?.groups ?? []) as string[]).sort().map((group: string) => ({
-            id: group
+            id: group,
+            name: group,
         })),
         enabled: !user.disabled
-    }))
+    })
+}
+export async function listUsers(filter: { q?: string, group?: string }) {
+    const list = await admin.auth().listUsers();
+    let users = list.users.map(mapUser)
     if (filter.group) {
         users = users.filter(user => user.groups.map(group => group.id).includes(filter.group!!))
     }
@@ -66,6 +70,11 @@ export async function listUsers(filter: { q?: string, group?: string }) {
         users = users.filter(user => fullTextSearch(user, filter.q!!.toLowerCase()))
     }
     return users;
+}
+
+export async function getUser(uid: string) {
+    const user = await admin.auth().getUser(uid);
+    return mapUser(user);
 }
 
 function fullTextSearch(user: { id: string; email: string | undefined; displayName: string | undefined; groups: any; enabled: boolean; }, q: string) {

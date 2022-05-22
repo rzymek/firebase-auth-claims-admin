@@ -1,6 +1,6 @@
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
-import { assignGroups, listGroups, listUsers, toggleDisabled } from "./actions";
+import { assignGroups, getUser, listGroups, listUsers, toggleDisabled } from "./actions";
 import { checkAdmin, tokenBelongsToProjectOwner } from "./checkAdmin";
 import { getProjectConfig } from "./projectConfig";
 
@@ -9,6 +9,7 @@ admin.initializeApp();
 exports.authActions = functions.https.onCall(async (params: {
     action: string,
     uids: string[],
+    uid: string,
     groups: { [group: string]: boolean },
     filter?: {
         group?: string,
@@ -18,26 +19,29 @@ exports.authActions = functions.https.onCall(async (params: {
     await checkAdmin(context.auth?.token);
     const actions: { [action: string]: () => Promise<unknown> } = {
         async disable() {
-            return await toggleDisabled(params.uids, true, context.auth?.uid);
+            return toggleDisabled(params.uids, true, context.auth?.uid);
         },
         async enable() {
-            return await toggleDisabled(params.uids, false);
+            return toggleDisabled(params.uids, false);
         },
         async listUsers() {
             return listUsers({ q: params.filter?.q, group: params.filter?.group });
+        },
+        async getUser() {
+            return getUser(params.uid);
         },
         async listGroups() {
             return listGroups();
         },
         async assignGroups() {
-            return await assignGroups(params.uids, params.groups, context.auth?.uid)
+            return assignGroups(params.uids, params.groups, context.auth?.uid)
         },
         async delete() {
             const withoutCaller = params.uids.filter(it => it !== context.auth?.uid);
             await admin.auth().deleteUsers(withoutCaller)
         },
         async isProjectOwner() {
-            return await tokenBelongsToProjectOwner(context.auth?.token)
+            return tokenBelongsToProjectOwner(context.auth?.token)
         }
     }
     return await actions[params.action]?.();

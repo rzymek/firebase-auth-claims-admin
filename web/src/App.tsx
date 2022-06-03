@@ -3,6 +3,7 @@ import LockOpenIcon from '@mui/icons-material/LockOpen';
 import GroupFilterIcon from '@mui/icons-material/Security';
 import { Card, CardContent, CircularProgress, Typography, useMediaQuery } from "@mui/material";
 import { initializeApp } from "firebase/app";
+import { useListContext } from 'ra-core';
 import React, { useEffect, useState } from "react";
 import {
   Admin, AdminProps, AppBar, ArrayField, BooleanField, BulkDeleteWithConfirmButton, BulkUpdateButton, ChipField,
@@ -13,7 +14,7 @@ import { AuthConfig } from "./AuthConfig";
 import { createAuthProvider } from "./authProvider";
 import { createDataProvider } from "./dataProvider";
 import { createLoginPage } from "./LoginPage";
-import { UpdateGroupsButton } from './UpdateGroupsButton';
+import { GroupsPopover, UpdateGroupsButton } from './UpdateGroupsButton';
 
 export const GroupList = () => (
   <List>
@@ -76,16 +77,34 @@ function FilterSidebar() {
   </Card>
 }
 
+
+function SelectableSimpleList() {
+  const [anchorEl, setAnchorEl] = useState<Element>();
+  const { onSelect } = useListContext();
+  return <>
+    <SimpleList
+      primaryText={record => <span data-id={record.id}>{record.displayName} <BooleanField source="enabled" /></span>}
+      secondaryText={record => <EmailField source="email" />}
+      tertiaryText={record => <GroupsField />}
+      linkType={false}
+      onClick={(e) => {
+        const element = e.target as HTMLElement;
+        const id = element.querySelector('[data-id]')?.getAttribute("data-id");
+        onSelect([id]);
+        setAnchorEl(element);
+      }}
+    />
+    {anchorEl && <GroupsPopover anchorEl={anchorEl} onClose={() => setAnchorEl(undefined)} />}
+  </>
+}
+
 export const UserList = () => {
   const isSmall = useMediaQuery((theme: RaThemeOptions) => theme.breakpoints?.down?.('sm')!!);
+
   return (
     <List filters={filters} actions={<TopToolbar><ExportButton /></TopToolbar>} aside={<FilterSidebar />}>
       {isSmall
-        ? <SimpleList
-          primaryText={record => <>{record.displayName} <BooleanField source="enabled" /></>}
-          secondaryText={record => <EmailField source="email" />}
-          tertiaryText={record => <GroupsField />}
-        />
+        ? <SelectableSimpleList />
         : <Datagrid rowClick="toggleSelection" bulkActionButtons={<ListActions />}>
           <TextField source="displayName" />
           <EmailField source="email" />

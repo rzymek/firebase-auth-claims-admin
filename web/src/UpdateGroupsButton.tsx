@@ -83,12 +83,36 @@ function computeState(selection: string[][], group: string): CheckboxProps {
 function computeGroupsState(users: any[], groups: string[], selectedIds: string[]): { [group: string]: ReturnType<typeof computeState> } {
     const groupSelection = users
         .filter(it => selectedIds.includes(it.id))
-        .map(it => it.groups.map((g: any) => g.name));
+        .map(it => it.groups.map((g: any) => g.id));
     return groups
         .reduce((res, group) => ({
             ...res,
             [group]: computeState(groupSelection, group)
         }), {})
+}
+
+export function GroupsPopover(props: {
+    anchorEl: Element | undefined;
+    onClose(): void;
+}) {
+    const { anchorEl, onClose } = props;
+    return <Popover
+        open={!!anchorEl}
+        anchorEl={anchorEl}
+        onClose={onClose}
+        anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+        }}
+        transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+        }}
+    >
+        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+            {anchorEl && <GroupsEdit />}
+        </div>
+    </Popover>
 }
 export function UpdateGroupsButton(props: any) {
     const [anchorEl, setAnchorEl] = useState<Element>();
@@ -97,22 +121,6 @@ export function UpdateGroupsButton(props: any) {
         <Button label="Groups" onClick={e => setAnchorEl(e.currentTarget)}>
             <SecurityIcon />
         </Button>
-        <Popover
-            open={!!anchorEl}
-            anchorEl={anchorEl}
-            onClose={() => setAnchorEl(undefined)}
-            anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right',
-            }}
-            transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-            }}
-        >
-            <div style={{ padding: 16, display: 'flex', flexDirection: 'column', position: 'relative' }}>
-                {anchorEl && <GroupsEdit />}
-            </div>
-        </Popover>
+        <GroupsPopover anchorEl={anchorEl} onClose={() => setAnchorEl(undefined)} />
     </>
 }

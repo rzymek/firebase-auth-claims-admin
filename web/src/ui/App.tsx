@@ -10,19 +10,11 @@ import {
   Datagrid, defaultTheme, EmailField, ExportButton, FilterList, FilterListItem, Layout, LayoutProps, List, MutationMode, RaThemeOptions, Resource, SearchInput, SimpleList, SingleFieldList, TextField, ToggleThemeButton, TopToolbar, useGetList
 } from 'react-admin';
 import "./App.css";
-import { AuthConfig } from "./AuthConfig";
-import { createAuthProvider } from "./authProvider";
-import { createDataProvider } from "./dataProvider";
+import { AuthConfig } from "../AuthConfig";
+import { createAuthProvider } from "../authProvider";
+import { createDataProvider } from "../dataProvider";
 import { createLoginPage } from "./LoginPage";
-import { GroupsPopover, UpdateGroupsButton } from './UpdateGroupsButton';
-
-export const GroupList = () => (
-  <List>
-    <Datagrid rowClick="edit">
-      <TextField source="displayName" />
-    </Datagrid>
-  </List>
-);
+import { GroupsPopover, UpdateGroupsButton } from './resource/UpdateGroupsButton';
 
 const ListActions = () => {
   const mutationMode: MutationMode = "pessimistic";

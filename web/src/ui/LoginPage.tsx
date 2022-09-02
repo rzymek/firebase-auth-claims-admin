@@ -3,7 +3,7 @@ import { getAuth } from "firebase/auth";
 import React from "react";
 import { Login } from "react-admin";
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-import { AuthConfig } from "./AuthConfig";
+import { AuthConfig } from "../AuthConfig";
 
 export function createLoginPage(firebaseApp: FirebaseApp, authConfig: AuthConfig) {
     return (props: any) => {

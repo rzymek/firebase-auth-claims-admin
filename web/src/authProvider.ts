@@ -29,7 +29,7 @@ export function createAuthProvider(firebaseApp: FirebaseApp): AuthProvider {
         async logout() {
             await firebaseAuth.signOut()
         },
-        async checkAuth(params: any): Promise<void> {
+        async checkAuth(): Promise<void> {
             const user = await currentUser(firebaseAuth);
             if (!user) {
                 return Promise.reject({ message: false });
@@ -45,11 +45,6 @@ export function createAuthProvider(firebaseApp: FirebaseApp): AuthProvider {
                 return Promise.reject({ message: `No admin nor project owner` })
             }
         },
-        async checkError(error: any): Promise<void> {
-        },
-        async getPermissions(params: any): Promise<any> {
-            return [];
-        },
         async getIdentity() {
             const user = await currentUser(firebaseAuth);
             return {
@@ -57,7 +52,12 @@ export function createAuthProvider(firebaseApp: FirebaseApp): AuthProvider {
                 avatar: user.photoURL ?? undefined,
                 fullName: user.displayName ?? undefined
             }
-        }
+        },
+        async checkError(): Promise<void> {
+        },
+        async getPermissions(): Promise<any> {
+            return [];
+        },
     }
 
 }

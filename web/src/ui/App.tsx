@@ -151,7 +151,7 @@ function App() {
         authProvider: createAuthProvider(firebaseApp),
         loginPage: createLoginPage(firebaseApp, authConfig),
       })
-    }).catch(() => setAdminProps({}));
+    });
   }, []);
   return !adminProps ? <Loading /> :
     <Admin requireAuth {...adminProps} layout={NoMenuLayout}>
